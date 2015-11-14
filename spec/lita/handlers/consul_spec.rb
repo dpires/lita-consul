@@ -4,6 +4,7 @@ describe Lita::Handlers::Consul, lita_handler: true do
   describe 'lita routes' do
     it { is_expected.to route_command('consul get mykey').to(:consul_get) }
     it { is_expected.to route_command('consul set mykey myvalue').to(:consul_set) }
+    it { is_expected.to route_command('consul members').to(:consul_members) }
   end
 
   before do
@@ -57,12 +58,30 @@ describe Lita::Handlers::Consul, lita_handler: true do
     }
   }
 
+  let(:members_response) {
+    %{
+      [
+        {"Node":"node1.node.consul","Address":"192.168.0.33"},
+        {"Node":"node2.node.consul","Address":"192.168.0.34"}
+      ]
+    }
+  }
+
+  describe '#consul members' do
+    it 'should list member nodes' do
+      allow(response).to receive(:body).and_return(members_response)
+      send_command('consul members')
+      expect(replies.last).to eq("node1.node.consul - 192.168.0.33\nnode2.node.consul - 192.168.0.34")
+    end
+  end
+
   describe '#consul get' do
     it 'return value for key' do
       allow(response).to receive(:body).and_return(single_key_response)
       send_command('consul get mykey')
       expect(replies.last).to eq("mykey = testing")
     end
+
     it 'return null value for key' do
       allow(response).to receive(:body).and_return(null_value_response)
       send_command('consul get mykey')

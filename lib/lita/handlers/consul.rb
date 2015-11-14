@@ -14,6 +14,19 @@ module Lita
       route /^consul set ([a-zA-Z0-9\-\/_]+) ([a-zA-Z0-9\-\/_]+)/, :consul_set, command: true, help: {
         "consul set <key> <value>" => "Set <value> for <key>"
       }
+  
+      route /^consul members/, :consul_members, command: true, help: {
+        "consul members" => "Return consul nodes"
+      }
+
+      def consul_members(response)
+          resp = http.get("#{api_url}/catalog/nodes/")
+          replies = []
+          MultiJson.load(resp.body).each do | node |
+            replies << "#{node['Node']} - #{node['Address']}"
+          end 
+          response.reply replies.join("\n")
+      end
 
       def consul_get(response)
         key = response.matches.first.first
