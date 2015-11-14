@@ -21,21 +21,6 @@ module Lita
         value = get_key_value(key)
         response.reply "#{key} = #{value}"
       end
-=begin
-        begin
-          resp = http.get("#{api_url}/kv/#{key}")
-          obj = MultiJson.load(resp.body)
-          unless obj[0]["Value"].nil?
-            value = Base64.decode64(obj[0]["Value"])
-            response.reply "#{key} = #{value}"
-          else
-            response.reply "#{key} = null"
-          end
-        rescue Faraday::ConnectionFailed=> e
-          response.reply e.to_s
-        end
-      end
-=end
 
       def consul_set(response)
         key = response.matches.first.first
