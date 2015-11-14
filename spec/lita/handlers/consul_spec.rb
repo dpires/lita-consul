@@ -8,6 +8,7 @@ describe Lita::Handlers::Consul, lita_handler: true do
 
   before do
     allow_any_instance_of(Faraday::Connection).to receive(:get).and_return(response)
+    allow_any_instance_of(Faraday::Connection).to receive(:put).and_return(response)
   end
     
   let(:response) { double("Faraday::Response") }
@@ -72,6 +73,7 @@ describe Lita::Handlers::Consul, lita_handler: true do
   describe '#consul set' do
     it 'set and return value for key' do
       allow(response).to receive(:body).and_return(new_key_response)
+      allow(response).to receive(:status).and_return(200)
       send_command('consul set myapp/config/url www.test.com')
       expect(replies.last).to eq("myapp/config/url = www.test.com")
     end
