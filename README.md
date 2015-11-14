@@ -1,9 +1,9 @@
 # lita-consul
 
 [![Build Status](https://travis-ci.org/dpires/lita-consul.png?branch=master)](https://travis-ci.org/dpires/lita-consul)
-[![Coverage Status](https://coveralls.io/repos/dpires/lita-consul/badge.png)](https://coveralls.io/r/dpires/lita-consul)
+[![Coverage Status](https://coveralls.io/repos/dpires/lita-consul/badge.svg?branch=master&service=github)](https://coveralls.io/github/dpires/lita-consul?branch=master)
 
-***lita-consul*** is a handler for [Lita](https://github.com/litaio/lita) for interacting with [Consul](https://github.com/hashicorp/consul).
+**lita-consul** is a handler for [Lita](https://github.com/litaio/lita) for interacting with [Consul](https://github.com/hashicorp/consul).
 
 ## Installation
 
