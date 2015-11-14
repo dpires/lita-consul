@@ -11,9 +11,17 @@ module Lita
         "consul get <key>" => "Return value for <key>"
       }
 
+      route /^consul set ([a-zA-Z0-9\-\/_]+) ([a-zA-Z0-9\-\/_]+)/, :consul_set, command: true, help: {
+        "consul set <key> <value>" => "Set <value> for <key>"
+      }
+
       def consul_get(response)
         key = response.matches.first.first
 
+        value = get_key_value(key)
+        response.reply "#{key} = #{value}"
+      end
+=begin
         begin
           resp = http.get("#{api_url}/kv/#{key}")
           obj = MultiJson.load(resp.body)
@@ -27,8 +35,38 @@ module Lita
           response.reply e.to_s
         end
       end
+=end
+
+      def consul_set(response)
+        key = response.matches.first.first
+        value = response.matches.first.last
+        begin
+          resp = http.put("#{api_url}/kv/#{key}", value)
+          if resp.status == 200
+            value = get_key_value(key)
+            response.reply "#{key} = #{value}"
+          else
+            response.reply resp.body
+          end
+        end
+      end
 
       private
+
+      def get_key_value(key)
+        begin
+          resp = http.get("#{api_url}/kv/#{key}")
+          obj = MultiJson.load(resp.body)
+          unless obj[0]["Value"].nil?
+            value = Base64.decode64(obj[0]["Value"])
+            "#{value}"
+          else
+            "null"
+          end
+        rescue Faraday::ConnectionFailed=> e
+          e.to_s
+        end
+      end
       
       def api_url
         host = "http://127.0.0.1"
