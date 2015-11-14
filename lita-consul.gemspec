@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-consul"
-  spec.version       = "0.0.4"
+  spec.version       = "0.0.5"
   spec.authors       = ["David Pires"]
   spec.email         = ["david.pires@gmail.com"]
   spec.description   = "Lita handler for Consul"
