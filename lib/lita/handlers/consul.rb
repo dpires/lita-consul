@@ -20,8 +20,10 @@ module Lita
       }
 
       def consul_members(response)
-          resp = http.get("#{api_url}/catalog/nodes/")
+          resp = http.get("#{api_url}/catalog/nodes")
           replies = []
+          log.info resp.status
+          log.info resp.body
           MultiJson.load(resp.body).each do | node |
             replies << "#{node['Node']} - #{node['Address']}"
           end 
