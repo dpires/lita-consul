@@ -20,19 +20,26 @@ module Lita
       }
 
       def consul_members(response)
-          resp = http.get("#{api_url}/catalog/nodes")
-          replies = []
-          MultiJson.load(resp.body).each do | node |
-            replies << "#{node['Node']} - #{node['Address']}"
-          end 
-          response.reply replies.join("\n")
+          begin
+            resp = http.get("#{api_url}/catalog/nodes")
+            replies = []
+            MultiJson.load(resp.body).each do | node |
+              replies << "#{node['Node']} - #{node['Address']}"
+            end 
+            response.reply replies.join("\n")
+          rescue Faraday::ConnectionFailed => e
+            response.reply e.message
+          end
       end
 
       def consul_get(response)
         key = response.matches.first.first
-
-        value = get_key_value(key)
-        response.reply "#{key} = #{value}"
+        begin
+          value = get_key_value(key)
+          response.reply "#{key} = #{value}"
+        rescue Faraday::ConnectionFailed => e
+          response.reply e.message
+        end
       end
 
       def consul_set(response)
@@ -40,19 +47,16 @@ module Lita
         value = response.matches.first.last
         begin
           resp = http.put("#{api_url}/kv/#{key}", value)
-          if resp.status == 200
-            value = get_key_value(key)
-            response.reply "#{key} = #{value}"
-          else
-            response.reply resp.body
-          end
+          value = get_key_value(key)
+          response.reply "#{key} = #{value}"
+        rescue Faraday::ConnectionFailed => e
+          response.reply e.message
         end
       end
 
       private
 
       def get_key_value(key)
-        begin
           resp = http.get("#{api_url}/kv/#{key}")
           obj = MultiJson.load(resp.body)
           unless obj[0]["Value"].nil?
@@ -61,9 +65,6 @@ module Lita
           else
             "null"
           end
-        rescue Faraday::ConnectionFailed=> e
-          e.to_s
-        end
       end
       
       def api_url

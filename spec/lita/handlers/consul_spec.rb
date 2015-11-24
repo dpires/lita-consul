@@ -68,6 +68,12 @@ describe Lita::Handlers::Consul, lita_handler: true do
   }
 
   describe '#consul members' do
+    it 'should catch connection error' do
+      allow_any_instance_of(Faraday::Connection).to receive(:get).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      send_command('consul members')
+      expect(replies.last).to eq('Connection refused - connect(2)');
+    end
+
     it 'should list member nodes' do
       allow(response).to receive(:body).and_return(members_response)
       send_command('consul members')
@@ -76,13 +82,19 @@ describe Lita::Handlers::Consul, lita_handler: true do
   end
 
   describe '#consul get' do
-    it 'return value for key' do
+    it 'should catch error when exception occurs' do
+      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      send_command('consul get mykey')
+      expect(replies.last).to eq('Connection refused - connect(2)');
+    end
+
+    it 'should return value for key' do
       allow(response).to receive(:body).and_return(single_key_response)
       send_command('consul get mykey')
       expect(replies.last).to eq("mykey = testing")
     end
 
-    it 'return null value for key' do
+    it 'should return null value for key' do
       allow(response).to receive(:body).and_return(null_value_response)
       send_command('consul get mykey')
       expect(replies.last).to eq("mykey = null")
@@ -90,7 +102,13 @@ describe Lita::Handlers::Consul, lita_handler: true do
   end
 
   describe '#consul set' do
-    it 'set and return value for key' do
+    it 'should catch error when exception occurs' do
+      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      send_command('consul set mykey value')
+      expect(replies.last).to eq('Connection refused - connect(2)');
+    end
+
+    it 'should set and return value for key' do
       allow(response).to receive(:body).and_return(new_key_response)
       allow(response).to receive(:status).and_return(200)
       send_command('consul set myapp/config/url www.test.com')
