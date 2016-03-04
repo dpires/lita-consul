@@ -3,8 +3,8 @@ require 'base64'
 module Lita
   module Handlers
     class Consul < Handler
-      config :consul_host
-      config :consul_port
+      config :consul_host, type: String, default: 'http://127.0.0.1'
+      config :consul_port, type: String, default: '8500'
 
       route(
         %r{^consul\sget\s(?<key>[\w\-\/]+)},
@@ -75,13 +75,7 @@ module Lita
       end
 
       def api_url
-        host = 'http://127.0.0.1'
-        port = '8500'
-
-        host = config.consul_host if config.consul_host
-        port = config.consul_port if config.consul_port
-
-        "#{host}:#{port}/v1"
+        "#{config.consul_host}:#{config.consul_port}/v1"
       end
 
       Lita.register_handler(self)
