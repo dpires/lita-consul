@@ -1,0 +1,10 @@
+Documentation:
+  Exclude:
+    - lib/lita/handlers/consul.rb
+
+FileName:
+  Exclude:
+    - lib/lita-consul.rb
+
+LineLength:
+  Max: 160

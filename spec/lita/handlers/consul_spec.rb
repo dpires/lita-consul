@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe Lita::Handlers::Consul, lita_handler: true do
   describe 'lita routes' do
@@ -11,10 +11,10 @@ describe Lita::Handlers::Consul, lita_handler: true do
     allow_any_instance_of(Faraday::Connection).to receive(:get).and_return(response)
     allow_any_instance_of(Faraday::Connection).to receive(:put).and_return(response)
   end
-    
-  let(:response) { double("Faraday::Response") }
-  let(:single_key_response) {
-    %{
+
+  let(:response) { double('Faraday::Response') }
+  let(:single_key_response) do
+    %(
       [
         {
           "CreateIndex":67,
@@ -25,11 +25,11 @@ describe Lita::Handlers::Consul, lita_handler: true do
           "Value":"dGVzdGluZw=="
         }
       ]
-    }
-  }
+    )
+  end
 
-  let(:null_value_response) {
-    %{
+  let(:null_value_response) do
+    %(
       [
         {
           "CreateIndex":67,
@@ -40,11 +40,11 @@ describe Lita::Handlers::Consul, lita_handler: true do
           "Value":null
         }
       ]
-    }
-  }
+    )
+  end
 
-  let(:new_key_response) {
-    %{
+  let(:new_key_response) do
+    %(
       [
         {
           "CreateIndex":67,
@@ -55,23 +55,23 @@ describe Lita::Handlers::Consul, lita_handler: true do
           "Value":"d3d3LnRlc3QuY29t"
         }
       ]
-    }
-  }
+    )
+  end
 
-  let(:members_response) {
-    %{
+  let(:members_response) do
+    %(
       [
         {"Node":"node1.node.consul","Address":"192.168.0.33"},
         {"Node":"node2.node.consul","Address":"192.168.0.34"}
       ]
-    }
-  }
+    )
+  end
 
   describe '#consul members' do
     it 'should catch connection error' do
-      allow_any_instance_of(Faraday::Connection).to receive(:get).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      allow_any_instance_of(Faraday::Connection).to receive(:get).and_raise(Faraday::ConnectionFailed.new('Connection refused - connect(2)'))
       send_command('consul members')
-      expect(replies.last).to eq('Connection refused - connect(2)');
+      expect(replies.last).to eq('Connection refused - connect(2)')
     end
 
     it 'should list member nodes' do
@@ -83,36 +83,36 @@ describe Lita::Handlers::Consul, lita_handler: true do
 
   describe '#consul get' do
     it 'should catch error when exception occurs' do
-      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new('Connection refused - connect(2)'))
       send_command('consul get mykey')
-      expect(replies.last).to eq('Connection refused - connect(2)');
+      expect(replies.last).to eq('Connection refused - connect(2)')
     end
 
     it 'should return value for key' do
       allow(response).to receive(:body).and_return(single_key_response)
       send_command('consul get mykey')
-      expect(replies.last).to eq("mykey = testing")
+      expect(replies.last).to eq('mykey = testing')
     end
 
     it 'should return null value for key' do
       allow(response).to receive(:body).and_return(null_value_response)
       send_command('consul get mykey')
-      expect(replies.last).to eq("mykey = null")
+      expect(replies.last).to eq('mykey = null')
     end
   end
 
   describe '#consul set' do
     it 'should catch error when exception occurs' do
-      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new("Connection refused - connect(2)"))
+      allow_any_instance_of(Lita::Handlers::Consul).to receive(:get_key_value).and_raise(Faraday::ConnectionFailed.new('Connection refused - connect(2)'))
       send_command('consul set mykey value')
-      expect(replies.last).to eq('Connection refused - connect(2)');
+      expect(replies.last).to eq('Connection refused - connect(2)')
     end
 
     it 'should set and return value for key' do
       allow(response).to receive(:body).and_return(new_key_response)
       allow(response).to receive(:status).and_return(200)
       send_command('consul set myapp/config/url www.test.com')
-      expect(replies.last).to eq("myapp/config/url = www.test.com")
+      expect(replies.last).to eq('myapp/config/url = www.test.com')
     end
   end
 end
