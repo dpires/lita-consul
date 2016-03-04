@@ -7,7 +7,7 @@ module Lita
       config :consul_port
 
       route(
-        %r{^consul get ([a-zA-Z0-9\-\/_]+)},
+        %r{^consul\sget\s(?<key>[\w\-\/]+)},
         :consul_get,
         command: true,
         help: {
@@ -16,7 +16,7 @@ module Lita
       )
 
       route(
-        %r{^consul set ([a-zA-Z0-9\-\/_]+) ([a-zA-Z0-9\-\/_]+)},
+        %r{^consul\sset\s(?<key>[\w\-\/]+)\s(?<value>[\w\-\/]+)},
         :consul_set,
         command: true,
         help: {
@@ -45,7 +45,7 @@ module Lita
       end
 
       def consul_get(response)
-        key = response.matches.first.first
+        key = response.match_data['key']
         value = get_key_value(key)
         response.reply "#{key} = #{value}"
       rescue Faraday::ConnectionFailed => e
@@ -53,8 +53,8 @@ module Lita
       end
 
       def consul_set(response)
-        key = response.matches.first.first
-        value = response.matches.first.last
+        key = response.match_data['key']
+        value = response.match_data['value']
         http.put("#{api_url}/kv/#{key}", value)
         value = get_key_value(key)
         response.reply "#{key} = #{value}"
