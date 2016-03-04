@@ -11,7 +11,7 @@ module Lita
         :consul_get,
         command: true,
         help: {
-          'consul get <key>' => 'Return value for <key>'
+          t('help.get.syntax') => t('help.get.desc')
         }
       )
 
@@ -20,7 +20,7 @@ module Lita
         :consul_set,
         command: true,
         help: {
-          'consul set <key> <value>' => 'Set <value> for <key>'
+          t('help.set.syntax') => t('help.set.desc')
         }
       )
 
@@ -29,7 +29,7 @@ module Lita
         :consul_members,
         command: true,
         help: {
-          'consul members' => 'Return consul nodes'
+          t('help.members.syntax') => t('help.members.desc')
         }
       )
 
