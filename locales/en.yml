@@ -2,3 +2,13 @@ en:
   lita:
     handlers:
       consul:
+        help:
+          get:
+            syntax: consul get <key>
+            desc: Return value for <key>
+          set:
+            syntax: consul set <key> <value>
+            desc: Set <value> for <key>
+          members:
+            syntax: consul members
+            desc: Return consul nodes
